@@ -2,13 +2,18 @@ package http
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/katasuner/authguard/internal/health"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/rupchella/authguard/internal/health"
 )
 
-func NewRouter() *chi.Mux {
+func NewRouter(db *pgxpool.Pool) *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Get("/health", health.Handler)
+	healthHandler := health.NewHandler(db)
+
+	r.Get("/health", healthHandler.Health)
+	r.Get("/ready", healthHandler.Ready)
 
 	return r
 }
